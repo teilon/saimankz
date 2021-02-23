@@ -23,17 +23,16 @@ class SaimanCrawlerSpider(CrawlSpider):
         products = response.xpath("//div[@class='products-list']/a")
         for product in products:
             url = product.xpath(".//@href").get()
-            # absolut_url = response.follow(url)
-
-            # yield scrapy.Request(url=absolut_url, callback='parse_item', meta=meta)
+            
             yield response.follow(url=url, callback=self.parse_item, meta=meta)
         
         paginator = response.xpath("//div[@class='paginator']")
         if paginator:
-            last_page = paginator.xpath(".//a[position() = last()]")
-            if not last_page:
-                next_page = paginator.xpath(".//a[position() + 1]/@href").get()
-                yield Request(url=next_page, callback=self.parse_category)
+            is_last_page = paginator.xpath(".//a[@class='active' and position() = last()]")
+            if not is_last_page:
+                next_page = paginator.xpath(".//a[@class='active']/following-sibling::a[1]/@href").get()
+                absolute_url = f"{response.url}{next_page}"
+                yield scrapy.Request(url=absolute_url, callback=self.parse_category)
 
     def parse_item(self, response):
         yield {
