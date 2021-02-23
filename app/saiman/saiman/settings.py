@@ -62,9 +62,14 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'saiman.pipelines.SaimanPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'saiman.pipelines.SQLlitePipeline': 300,
+    'scrapy.pipelines.images.ImagesPipeline': 1,
+}
+
+IMAGES_STORE = './img'
+
+DOWNLOAD_TIMEOUT = 1200
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
