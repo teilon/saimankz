@@ -3,13 +3,20 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-import scrapy
+#import scrapy
+from scrapy import Item, Field
 from scrapy.loader.processors import TakeFirst
 
 
-class SaimanItem(scrapy.Item):
-    image_urls = scrapy.Field()
-    images = scrapy.Field()
-    product_name = scrapy.Field(
+class SaimanItem(Item):
+    image_urls = Field()
+    images = Field()
+    product_name = Field(
         output_processor = TakeFirst()
     )
+
+class ProductItem(Item):
+    title = Field()
+    category = Field()
+    price = Field()
+    product_url = Field()

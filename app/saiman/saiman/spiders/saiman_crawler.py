@@ -6,6 +6,7 @@ import logging
 from datetime import datetime
 
 from saiman.items import SaimanItem
+from saiman.items import ProductItem
 
 
 class SaimanCrawlerSpider(CrawlSpider):
@@ -47,7 +48,13 @@ class SaimanCrawlerSpider(CrawlSpider):
         category = response.meta['category_name']
         title = response.xpath("normalize-space(//h1[@class='title-1']/text())").get()
         price = response.xpath("//div[@class='costs']/span/text()").get()
-        url = response.url
+        product_url = response.url
+
+        product_item = ProductItem()
+        product_item['category'] = category
+        product_item['title'] = title
+        product_item['price'] = price
+        product_item['product_url'] = product_url
 
         div_images = response.xpath("//div[@class='img-out img abs-m']")
         if div_images:
@@ -59,15 +66,9 @@ class SaimanCrawlerSpider(CrawlSpider):
 
                 loader.add_value('image_urls', absolute_url)
 
-                name = datetime.now()
-                name = name.strftime("%H%M%S%f")
+                name = datetime.now().strftime("%H%M%S%f")
                 loader.add_value('product_name', name)
 
                 yield loader.load_item()
         
-        yield {
-            'category': category,
-            'title': title,
-            'price': price,
-            'product_url': url,
-        }
+        yield product_item
