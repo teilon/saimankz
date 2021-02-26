@@ -66,9 +66,15 @@ class SaimanCrawlerSpider(CrawlSpider):
 
                 loader.add_value('image_urls', absolute_url)
 
+                #name = f'prod{datetime.now().strftime("%H%M%S%f")}'
                 name = datetime.now().strftime("%H%M%S%f")
                 loader.add_value('product_name', name)
 
                 yield loader.load_item()
         
         yield product_item
+
+
+    # {'image_urls': ['https://www.saiman.kz/i/Products/80.png'],
+    # 'images': [],
+    # 'product_name': '154056874683'}

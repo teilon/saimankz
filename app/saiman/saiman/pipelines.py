@@ -5,6 +5,7 @@
 
 
 # useful for handling different item types with a single interface
+import os
 import sqlite3
 from itemadapter import ItemAdapter
 from scrapy.loader import ItemLoader
@@ -72,32 +73,34 @@ class SQLlitePipeline:
     #  'product_name': '140325830074'
     #  }
 
+class CustomImagePipeline(ImagesPipeline):
 
-
-class ImagePipeline(ImagesPipeline):
-    def file_path(self, request, response=None, info=None):
-        #url = request.url
-        #file_name = url.split('/')[-1]
-        #return file_name
-
-        url = request if not isinstance(request, Request) else request.url
-        media_guid = hashlib.sha1(to_bytes(url)).hexdigest()
-        path, media_ext = os.path.splitext(url)
-        media_name = os.path.split(path)[1]
-        #return '%s_%s%s' % (media_name, media_guid, media_ext)
-        return '%s_%s%s' % (media_name, media_guid, media_ext)
-
+    def get_media_requests(self, item, info):
+        for image_url in item['image_urls']:
+            yield scrapy.Request(image_url)
 
     def item_completed(self, results, item, info):
         image_paths = [x['path'] for ok, x in results if ok]
         if not image_paths:
-            raise DropItem('Image Downloaded Failed')
+            raise DropItem("Item contains no images")
+        adapter = ItemAdapter(item)
+        adapter['image_paths'] = image_paths
         return item
-    
-    def get_media_requests(self, item, info):
-        yield Request(item['url'])
+
+    def file_path(self, request, response=None, info=None, *, item=None):
+        return 'files/' + os.path.basename(urlparse(request.url).path)
+
+        #image_guid = hashlib.sha1(to_bytes(request.url)).hexdigest()
+        #return f'fuller/{image_guid}.jpg'
+
+        #url = request if not isinstance(request, Request) else request.url
+        #media_guid = hashlib.sha1(to_bytes(url)).hexdigest()
+        #path, media_ext = os.path.splitext(url)
+        #media_name = os.path.split(path)[1]
+        #return '%s_%s%s' % (media_name, media_guid, media_ext)
 
 
-class SaimanItem:
-    def process_item(self, item, spider):
-        return item
+
+    # {'image_urls': ['https://www.saiman.kz/i/Products/80.png'],
+    # 'images': [],
+    # 'product_name': '154056874683'}
