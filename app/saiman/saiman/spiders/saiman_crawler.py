@@ -5,7 +5,7 @@ from scrapy.loader import ItemLoader
 import logging
 from datetime import datetime
 
-from saiman.items import SaimanItem
+from saiman.items import ImageItem
 from saiman.items import ProductItem
 
 
@@ -55,22 +55,24 @@ class SaimanCrawlerSpider(CrawlSpider):
         product_item['title'] = title
         product_item['price'] = price
         product_item['product_url'] = product_url
+        product_item['image_name'] = ''
 
         div_images = response.xpath("//div[@class='img-out img abs-m']")
         if div_images:
-            for div_image in div_images:
-                loader = ItemLoader(item=SaimanItem(), selector=div_image)
+            for link in div_images:
+                loader = ItemLoader(item=ImageItem(), selector=link)
 
-                relative_url = div_image.xpath(".//img/@src").extract_first()
+                relative_url = link.xpath(".//img/@src").extract_first()
                 absolute_url = response.urljoin(relative_url)
 
                 loader.add_value('image_urls', absolute_url)
 
                 #name = f'prod{datetime.now().strftime("%H%M%S%f")}'
                 name = datetime.now().strftime("%H%M%S%f")
-                loader.add_value('product_name', name)
+                loader.add_value('image_name', name)
 
                 yield loader.load_item()
+                product_item['image_name'] = loader.item['image_name']
         
         yield product_item
 
