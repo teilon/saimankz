@@ -65,7 +65,6 @@ ROBOTSTXT_OBEY = True
 ITEM_PIPELINES = {
     'saiman.pipelines.SQLlitePipeline': 300,
     'saiman.pipelines.CustomImagePipeline': 1,
-    # 'scrapy.pipelines.images.ImagesPipeline': 2,
 }
 
 IMAGES_STORE = './img'

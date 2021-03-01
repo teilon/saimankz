@@ -3,7 +3,7 @@
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/items.html
 
-#import scrapy
+import os
 from scrapy import Item, Field
 from scrapy.loader.processors import TakeFirst, MapCompose
 
@@ -16,9 +16,8 @@ class ImageItem(Item):
     images = Field()
     image_name = Field(
         # input_processor = MapCompose(remove_extention),
-        output_processor = TakeFirst()        
+        output_processor = TakeFirst()
     )
-    # image_path = Field()
 
 class ProductItem(Item):
     title = Field()

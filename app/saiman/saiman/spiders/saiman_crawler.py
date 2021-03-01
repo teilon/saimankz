@@ -2,7 +2,7 @@ import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.loader import ItemLoader
-import logging
+
 from datetime import datetime
 
 from saiman.items import ImageItem
@@ -64,19 +64,11 @@ class SaimanCrawlerSpider(CrawlSpider):
 
                 relative_url = link.xpath(".//img/@src").extract_first()
                 absolute_url = response.urljoin(relative_url)
-
                 loader.add_value('image_urls', absolute_url)
 
-                #name = f'prod{datetime.now().strftime("%H%M%S%f")}'
                 name = datetime.now().strftime("%H%M%S%f")
                 loader.add_value('image_name', name)
-
+                
                 yield loader.load_item()
                 product_item['image_name'] = loader.item['image_name']
-        
         yield product_item
-
-
-    # {'image_urls': ['https://www.saiman.kz/i/Products/80.png'],
-    # 'images': [],
-    # 'product_name': '154056874683'}

@@ -5,15 +5,10 @@
 
 
 # useful for handling different item types with a single interface
-import os
 import sqlite3
-from itemadapter import ItemAdapter
-from scrapy.loader import ItemLoader
-from scrapy.exceptions import DropItem
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy import Request
-
-from saiman.items import ImageItem
+from saiman.items import ProductItem
 
 CREATE_TABLE_PRODUCTS = '''
     CREATE TABLE products(
@@ -45,8 +40,7 @@ class SQLlitePipeline:
         self.connection.close()
 
     def process_item(self, item, spider):
-
-        if item.get('title'):
+        if isinstance(item, ProductItem):
             self.c.execute(INSERT_PRODUCT, (
                 item.get('title'),
                 item.get('category'),
@@ -55,8 +49,8 @@ class SQLlitePipeline:
                 item.get('image_name'),
             ))
             self.connection.commit()
-
         return item
+
 
 class CustomImagePipeline(ImagesPipeline):
 
@@ -69,4 +63,3 @@ class CustomImagePipeline(ImagesPipeline):
         image_name = request.meta['image_name']
         path = f'fuller/{image_name}.jpg'
         return path
-        # return '%s.jpg' % request.meta['image_name']
